@@ -1,0 +1,222 @@
+@section('title')
+Aplikasi Cetak Kartu Identitas
+@endsection
+@extends('layouts.main')
+@section('style')
+<!-- DataTables css -->
+<link href="{{ asset('assets/plugins/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('assets/plugins/datatables/buttons.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
+<!-- Responsive Datatable css -->
+<link href="{{ asset('assets/plugins/datatables/responsive.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
+@endsection
+@section('rightbar-content')
+<!-- Start Breadcrumbbar -->
+<div class="breadcrumbbar">
+    <div class="row align-items-center">
+        <div class="col-md-8 col-lg-8">
+            <h4 class="page-title">Kode Cetak</h4>
+            <div class="breadcrumb-list">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{url('/')}}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Kode Cetak</li>
+                </ol>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- End Breadcrumbbar -->
+<!-- Start Contentbar -->
+<div class="contentbar">
+    <!-- Start row -->
+    <div class="row">
+        <!-- Start col -->
+        <div class="col-lg-12">
+            <div class="card m-b-30">
+                <div class="card-header">
+                    <h5 class="card-title">Data Pegawai</h5>
+                </div>
+                <div class="card-body">
+                    <!-- <h6 class="card-subtitle">With DataTables you can alter the ordering characteristics of the table at initialisation time.</h6> -->
+                    <div class="container row">
+                        <form action="{{route('searchnip')}}" class="col-md-4" method="post">
+                            @csrf
+                            <div class="form-group">
+                                <div class="row">
+                                    <input type="text" class=" col-md-10" name="nip" placeholder="Masukkan Kode Cetak">
+                                    <button type='submit' class='btn btn-primary col-md-2'><i class='fa fa-search'></i></button>
+                                </div>
+                            </div>
+                        </form>
+                        <form action="{{route('printnip')}}" class="col-md-2 offset-md-6" method="post">
+                            @csrf
+                            <div class="form-group">
+                                <div class="row">
+                                    <input type="hidden" name="nip2" value="{{$req}}">
+                                    <button type='submit' class='btn btn-success col-md-10 offset-md-2'>Cetak Kartu <i class='fa fa-print'></i></button>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="table-responsive">
+                        <table class="display table table-striped table-bordered" style="font-size:smaller;">
+                            <thead>
+                                <tr>
+                                    <th>NIP</th>
+                                    <th>Nama</th>
+                                    <th>Jabatan</th>
+                                    <th>Instansi</th>
+                                    <th>Unit Kerja</th>
+                                    <th>Kode Cetak</th>
+                                    <th>Foto</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @foreach ($pegs as $peg)
+                                <tr>
+                                    <td>{{$peg->nip}}</td>
+                                    <td>{{$peg->nama}}</td>
+                                    <td>{{$peg->jabatan}}</td>
+                                    <td>{{$peg->lokasi}}</td>
+                                    <td>{{$peg->lokasi2}}</td>
+                                    <td>{{$peg->kdcetak}}</td>
+                                    <td><img src="assets/img/images/{{$peg->foto}}" alt="" width="75"></td>
+                                    <td>
+                                        <a type="button" class="btn btn-outline-warning btn-xs" data-toggle="modal" data-target="#modal-edit{{$peg->id}}" id="setedit">
+                                            <i class="fa fa-edit text-warning"></i>
+
+                                        </a>
+                                        <!-- Modal EDIT -->
+                                        <div class="modal fade" id="modal-edit{{$peg->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLabel">Edit Data Pegawai</h5><br>
+                                                        @php
+                                                        $nip = str_replace(' ', '', $peg->nip);
+                                                        @endphp
+                                                       
+
+
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+
+                                                    <form action="/dashboard/{{$peg->id}}" method="post" enctype="multipart/form-data">
+                                                        @method('patch')
+                                                        @csrf
+                                                        <div class="modal-body">
+                                                            <!--  -->
+                                                            <div class="form-group">
+                                                                {{$nip}}
+                                                            </div>
+                                                            <div class="form-group">
+                                                                
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="nip">NIP</label>
+                                                                <input type="text" id="data-nip" class="form-control" id="data-nip" name="nip" value="{{$peg->nip}}">
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label for="nama">Nama</label>
+                                                                <input type="text" class="form-control" id="data-nama" name="nama" value="{{$peg->nama}}">
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label for="username">Username</label>
+                                                                <input type="text" class="form-control" id="data-username" name="username" value="{{$peg->username}}">
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label for="jabatan">Jabatan</label>
+                                                                <input type="text" class="form-control" id="data-jabatan" name="jabatan" value="{{$peg->jabatan}}">
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label for="alamatkantor">Alamat Kantor</label>
+                                                                <input type="text" class="form-control" id="data-alamatkantor" name="alamatkantor" value="{{$peg->alamatkantor}}">
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label for="username">Lokasi</label>
+                                                                <input type="text" class="form-control" id="data-lokasi" name="lokasi" value="{{$peg->lokasi}}">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="username">Lokasi 2</label>
+                                                                <input type="text" class="form-control" id="data-lokasi2" name="lokasi2" value="{{$peg->lokasi2}}">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="username">Kode Cetak</label>
+                                                                <input type="text" class="form-control" id="data-kdcetak" name="kdcetak" value="{{$peg->kdcetak}}">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <div class="form-check">
+                                                                    <input type="hidden" name="foto" class="custom-control-input" value="{{$peg->foto}}" id="pol">
+                                                                    <input type="checkbox" name="foto" class="form-check-input" value="" id="a">
+                                                                    <label class="form-check-label" for="a">
+                                                                        Centang bila ingin mengganti foto
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label for="username">Foto</label>
+                                                                <input type="file" class="form-control" id="data-foto" name="foto">
+                                                            </div>
+                                                            <img src="assets/img/images/{{$peg->foto}}" alt="" width="75">
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                            <button type="submit" class="btn btn-primary">Simpan</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- <a href="/dashboard/{{$peg->id}}/edit" class='btn btn-outline-success btn-xs'><i class='fa fa-edit'></i></a> -->
+                                        <form action="" method="POST" class="d-inline">
+                                            <?= csrf_field(); ?>
+                                            <input type="hidden" name="_method" value="delete">
+                                            <button type='submit' class='btn btn-outline-danger btn-xs'><i class='fa fa-trash'></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        <div class="d-flex justify-content-center">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End col -->
+    </div>
+    <!-- End row -->
+</div>
+<!-- End Contentbar -->
+@endsection
+@section('script')
+
+
+
+<!-- Datatable js -->
+<script src="{{ asset('assets/plugins/datatables/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/datatables/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/datatables/buttons.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/datatables/jszip.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/datatables/pdfmake.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/datatables/vfs_fonts.js') }}"></script>
+<script src="{{ asset('assets/plugins/datatables/buttons.html5.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/datatables/buttons.print.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/datatables/buttons.colVis.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/datatables/dataTables.responsive.min.js') }}"></script>
+<script src="{{ asset('assets/plugins/datatables/responsive.bootstrap4.min.js') }}"></script>
+<script src="{{ asset('assets/js/custom/custom-table-datatable.js') }}"></script>
+@endsection
